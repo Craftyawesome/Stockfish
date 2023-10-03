@@ -155,7 +155,8 @@ Value Eval::evaluate(const Position& pos) {
   Value v;
   Color stm      = pos.side_to_move();
   int shuffling  = pos.rule50_count();
-  int simpleEval = simple_eval(pos, stm) + (int(pos.key() & 7) - 3);
+  int noise = int(pos.key() & 7);
+  int simpleEval = simple_eval(pos, stm) + (noise - 3);
 
   bool lazy = abs(simpleEval) >=   RookValue + KnightValue
                                  + 16 * shuffling * shuffling
@@ -180,8 +181,8 @@ Value Eval::evaluate(const Position& pos) {
            + optimism * (154 + npm                       )) / 1024;
   }
 
-  // Damp down the evaluation linearly when shuffling
-  v = v * (200 - shuffling) / 214;
+  // Damp down the evaluation when shuffling
+  v = v * (1600 - shuffling * (5 + noise)) / 1712;
 
   // Guarantee evaluation does not hit the tablebase range
   v = std::clamp(v, VALUE_TB_LOSS_IN_MAX_PLY + 1, VALUE_TB_WIN_IN_MAX_PLY - 1);
