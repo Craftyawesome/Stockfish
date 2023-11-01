@@ -346,6 +346,8 @@ void Thread::search() {
         pvLast         = 0;
 
         if (!Threads.increaseDepth)
+            searchAgainCounter += 2;
+        else if (TT.hashfull() > 900)
             searchAgainCounter++;
 
         // MultiPV loop. We perform a full root search for each PV line
@@ -381,7 +383,7 @@ void Thread::search() {
                 // Adjust the effective depth searched, but ensure at least one effective increment
                 // for every four searchAgain steps (see issue #2717).
                 Depth adjustedDepth =
-                  std::max(1, rootDepth - failedHighCnt - 3 * (searchAgainCounter + 1) / 4);
+                  std::max(1, rootDepth - failedHighCnt - 3 * (searchAgainCounter + 2) / 8);
                 bestValue = Stockfish::search<Root>(rootPos, ss, alpha, beta, adjustedDepth, false);
 
                 // Bring the best move to the front. It is critical that sorting
