@@ -175,7 +175,7 @@ Value evaluate(const Position& pos, bool adjusted, int* complexity) {
 
     ASSERT_ALIGNED(transformedFeatures, alignment);
 
-    const int  bucket     = (pos.count<ALL_PIECES>() - 1) / 4;
+    const int  bucket     = std::min((pos.count<ALL_PIECES>() - 1) / 4, 7);
     const auto psqt       = featureTransformer->transform(pos, transformedFeatures, bucket);
     const auto positional = network[bucket]->propagate(transformedFeatures);
 
