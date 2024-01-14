@@ -204,12 +204,12 @@ Value Eval::evaluate(const Position& pos, int optimism, Depth depth) {
     int   shuffling  = pos.rule50_count();
     int   simpleEval = simple_eval(pos, stm);
 
-    bool lazy = std::abs(simpleEval) > 16 * depth + 2250;
+    bool lazy = std::abs(simpleEval) > 8 * depth + 2400;
     if (lazy)
         v = simpleEval;
     else
     {
-        bool smallNet = std::abs(simpleEval) > 16 * depth + 750;
+        bool smallNet = std::abs(simpleEval) > 8 * depth + 900;
 
         int nnueComplexity;
 
