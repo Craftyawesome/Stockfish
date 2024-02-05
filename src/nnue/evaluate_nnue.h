@@ -47,9 +47,10 @@ namespace Stockfish::Eval::NNUE {
 // Hash value of evaluation function structure
 constexpr std::uint32_t HashValue[2] = {
   FeatureTransformer<TransformedFeatureDimensionsBig, nullptr>::get_hash_value()
-    ^ Network<TransformedFeatureDimensionsBig, L2Big, L3Big>::get_hash_value(),
+    ^ Network<TransformedFeatureDimensionsBig, L2Big, L3Big, Layers::ClippedReLU>::get_hash_value(),
   FeatureTransformer<TransformedFeatureDimensionsSmall, nullptr>::get_hash_value()
-    ^ Network<TransformedFeatureDimensionsSmall, L2Small, L3Small>::get_hash_value()};
+    ^ Network<TransformedFeatureDimensionsSmall, L2Small, L3Small, Layers::SqrClippedReLU>::
+      get_hash_value()};
 
 // Deleter for automating release of memory area
 template<typename T>
