@@ -54,7 +54,7 @@ constexpr int       L3Small                           = 32;
 constexpr IndexType PSQTBuckets = 8;
 constexpr IndexType LayerStacks = 8;
 
-template<IndexType L1, int L2, int L3>
+template<IndexType L1, int L2, int L3, template<IndexType> class Activation>
 struct Network {
     static constexpr IndexType TransformedFeatureDimensions = L1;
     static constexpr int       FC_0_OUTPUTS                 = L2;
@@ -64,7 +64,7 @@ struct Network {
     Layers::SqrClippedReLU<FC_0_OUTPUTS + 1>                                           ac_sqr_0;
     Layers::ClippedReLU<FC_0_OUTPUTS + 1>                                              ac_0;
     Layers::AffineTransform<FC_0_OUTPUTS * 2, FC_1_OUTPUTS>                            fc_1;
-    Layers::ClippedReLU<FC_1_OUTPUTS>                                                  ac_1;
+    Activation<FC_1_OUTPUTS>                                                           ac_1;
     Layers::AffineTransform<FC_1_OUTPUTS, 1>                                           fc_2;
 
     // Hash value embedded in the evaluation file
