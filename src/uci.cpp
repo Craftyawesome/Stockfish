@@ -47,6 +47,10 @@ namespace Stockfish {
 
 constexpr auto StartFEN  = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 constexpr int  MaxHashMB = Is64Bit ? 33554432 : 2048;
+int64_t        TcDivisor = 1;
+int            TcArr[3]  = {1, 3, 9};
+bool           isStart   = true;
+int            timeAdjustmentWhite, timeAdjustmentBlack = 0;
 
 
 namespace NN = Eval::NNUE;
@@ -141,7 +145,10 @@ void UCI::loop() {
         else if (token == "position")
             position(pos, is, states);
         else if (token == "ucinewgame")
+        {
             search_clear();
+            isStart = true;
+        }
         else if (token == "isready")
             sync_cout << "readyok" << sync_endl;
 
@@ -232,6 +239,22 @@ void UCI::go(Position& pos, std::istringstream& is, StateListPtr& states) {
         perft(pos.fen(), limits.perft, options["UCI_Chess960"]);
         return;
     }
+
+    if (isStart)
+    {
+        timeAdjustmentWhite = limits.time[WHITE] * (TcDivisor - 1) / TcDivisor;
+        timeAdjustmentBlack = limits.time[BLACK] * (TcDivisor - 1) / TcDivisor;
+        isStart             = false;
+    }
+
+    limits.time[WHITE] = limits.time[WHITE] - timeAdjustmentWhite;
+    limits.time[BLACK] = limits.time[BLACK] - timeAdjustmentBlack;
+
+    timeAdjustmentWhite += limits.inc[WHITE] * (TcDivisor - 1) / TcDivisor;
+    timeAdjustmentBlack += limits.inc[BLACK] * (TcDivisor - 1) / TcDivisor;
+
+    limits.inc[WHITE] /= TcDivisor;
+    limits.inc[BLACK] /= TcDivisor;
 
     threads.start_thinking(options, pos, states, limits);
 }
@@ -329,6 +352,8 @@ void UCI::position(Position& pos, std::istringstream& is, StateListPtr& states) 
 
     states = StateListPtr(new std::deque<StateInfo>(1));  // Drop the old state and create a new one
     pos.set(fen, options["UCI_Chess960"], &states->back());
+
+    TcDivisor = TcArr[pos.key() % std::size(TcArr)];
 
     // Parse the move list, if any
     while (is >> token && (m = to_move(pos, token)) != Move::none())
