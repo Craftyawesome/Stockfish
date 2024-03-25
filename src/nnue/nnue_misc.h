@@ -55,7 +55,7 @@ struct Networks;
 
 
 std::string trace(Position& pos, const Networks& networks);
-void        hint_common_parent_position(const Position& pos, const Networks& networks);
+void        hint_common_parent_position(const Position& pos, const Networks& networks, bool forceBig);
 
 }  // namespace Stockfish::Eval::NNUE
 }  // namespace Stockfish
