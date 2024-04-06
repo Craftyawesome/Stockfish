@@ -90,6 +90,9 @@ void TranspositionTable::resize(size_t mbSize, int threadCount) {
 void TranspositionTable::clear(size_t threadCount) {
     std::vector<std::thread> threads;
 
+    lastHashfull = 0;
+    biasedHashfull.store(0, std::memory_order_relaxed);
+
     for (size_t idx = 0; idx < size_t(threadCount); ++idx)
     {
         threads.emplace_back([this, idx, threadCount]() {
@@ -153,7 +156,10 @@ int TranspositionTable::hashfull() const {
             cnt += table[i].entry[j].depth8
                 && (table[i].entry[j].genBound8 & GENERATION_MASK) == generation8;
 
-    return cnt / ClusterSize;
+    lastHashfull = cnt / ClusterSize;
+    biasedHashfull.store(std::max(biasedHashfull.load(std::memory_order_relaxed), lastHashfull),
+                         std::memory_order_relaxed);
+    return lastHashfull;
 }
 
 }  // namespace Stockfish

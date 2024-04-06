@@ -42,11 +42,14 @@ namespace Stockfish::Eval::NNUE {
 constexpr std::string_view PieceToChar(" PNBRQK  pnbrqk");
 
 
-void hint_common_parent_position(const Position& pos, const Networks& networks) {
+void hint_common_parent_position(const Position& pos,
+                                 const Networks& networks,
+                                 bool            doubleThresholds) {
 
     int simpleEvalAbs = std::abs(simple_eval(pos, pos.side_to_move()));
-    if (simpleEvalAbs > Eval::SmallNetThreshold)
-        networks.small.hint_common_access(pos, simpleEvalAbs > Eval::PsqtOnlyThreshold);
+    if (simpleEvalAbs > Eval::SmallNetThreshold * (1 + doubleThresholds))
+        networks.small.hint_common_access(pos, simpleEvalAbs > Eval::PsqtOnlyThreshold
+                                                                 * (1 + doubleThresholds));
     else
         networks.big.hint_common_access(pos, false);
 }
