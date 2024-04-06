@@ -90,6 +90,8 @@ void TranspositionTable::resize(size_t mbSize, int threadCount) {
 void TranspositionTable::clear(size_t threadCount) {
     std::vector<std::thread> threads;
 
+    lastHashfull.store(0, std::memory_order_relaxed);
+
     for (size_t idx = 0; idx < size_t(threadCount); ++idx)
     {
         threads.emplace_back([this, idx, threadCount]() {
@@ -153,6 +155,7 @@ int TranspositionTable::hashfull() const {
             cnt += table[i].entry[j].depth8
                 && (table[i].entry[j].genBound8 & GENERATION_MASK) == generation8;
 
+    lastHashfull.store(cnt / ClusterSize, std::memory_order_relaxed);
     return cnt / ClusterSize;
 }
 

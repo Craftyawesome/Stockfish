@@ -19,6 +19,7 @@
 #ifndef TT_H_INCLUDED
 #define TT_H_INCLUDED
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 
@@ -97,10 +98,11 @@ class TranspositionTable {
         generation8 += GENERATION_DELTA;
     }
 
-    TTEntry* probe(const Key key, bool& found) const;
-    int      hashfull() const;
-    void     resize(size_t mbSize, int threadCount);
-    void     clear(size_t threadCount);
+    TTEntry*                 probe(const Key key, bool& found) const;
+    mutable std::atomic<int> lastHashfull = 0;
+    int                      hashfull() const;
+    void                     resize(size_t mbSize, int threadCount);
+    void                     clear(size_t threadCount);
 
     TTEntry* first_entry(const Key key) const {
         return &table[mul_hi64(key, clusterCount)].entry[0];
