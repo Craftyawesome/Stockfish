@@ -71,6 +71,7 @@ UCI::UCI(int argc, char** argv) :
 
     options["Clear Hash"] << Option([this](const Option&) { search_clear(); });
     options["Ponder"] << Option(false);
+    options["Allow_Smallnet"] << Option(true);
     options["MultiPV"] << Option(1, 1, MAX_MOVES);
     options["Skill Level"] << Option(20, 0, 20);
     options["Move Overhead"] << Option(10, 0, 5000);
