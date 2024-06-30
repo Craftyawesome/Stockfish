@@ -66,7 +66,7 @@ TUNE(a1, a2, a3, a4, a7, a8, a9, a10, a11, a12, a13,
      d1, d2, d3, d4, d5, dub, d6, d7, d8,
      e1, e3, e4, e5, e6, e7, e8,
      f1, f2, f3, f4, f5, f6, f7, f8, f9, f15,
-     g1, g2, g6, g7, g8, g9, g10, g11,
+     g1, g2, g3, g6, g7, g8, g9, g10, g11,
      g12, g13, g14, g15, g16, g17,
      h1, h2, h3, h4, h5, h6, h7,
     u1, z1);
