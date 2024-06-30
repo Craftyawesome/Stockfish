@@ -47,6 +47,11 @@ namespace NN = Eval::NNUE;
 constexpr auto StartFEN  = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 constexpr int  MaxHashMB = Is64Bit ? 33554432 : 2048;
 
+int64_t        TcDivisor = 1;
+int            TcArr[4]  = {1, 2, 4, 6};
+bool           isStart   = true;
+int            timeAdjustmentWhite, timeAdjustmentBlack = 0;
+
 Engine::Engine(std::string path) :
     binaryDirectory(CommandLine::get_binary_directory(path)),
     numaContext(NumaConfig::from_system()),
@@ -124,6 +129,23 @@ void Engine::go(Search::LimitsType& limits) {
     verify_networks();
     limits.capSq = capSq;
 
+    //sync_cout << "\n" << TcDivisor << sync_endl;
+    if (isStart)
+    {
+        timeAdjustmentWhite = limits.time[WHITE] * (TcDivisor - 1) / TcDivisor;
+        timeAdjustmentBlack = limits.time[BLACK] * (TcDivisor - 1) / TcDivisor;
+        isStart             = false;
+    }
+
+    limits.time[WHITE] = limits.time[WHITE] - timeAdjustmentWhite;
+    limits.time[BLACK] = limits.time[BLACK] - timeAdjustmentBlack;
+
+    timeAdjustmentWhite += limits.inc[WHITE] * (TcDivisor - 1) / TcDivisor;
+    timeAdjustmentBlack += limits.inc[BLACK] * (TcDivisor - 1) / TcDivisor;
+
+    limits.inc[WHITE] /= TcDivisor;
+    limits.inc[BLACK] /= TcDivisor;
+
     threads.start_thinking(options, pos, states, limits);
 }
 void Engine::stop() { threads.stop = true; }
@@ -136,6 +158,8 @@ void Engine::search_clear() {
 
     // @TODO wont work with multiple instances
     Tablebases::init(options["SyzygyPath"]);  // Free mapped files
+
+    isStart = true;
 }
 
 void Engine::set_on_update_no_moves(std::function<void(const Engine::InfoShort&)>&& f) {
@@ -162,6 +186,9 @@ void Engine::set_position(const std::string& fen, const std::vector<std::string>
     pos.set(fen, options["UCI_Chess960"], &states->back());
 
     capSq = SQ_NONE;
+    
+    TcDivisor = TcArr[pos.key() % std::size(TcArr)];
+    
     for (const auto& move : moves)
     {
         auto m = UCIEngine::to_move(pos, move);
