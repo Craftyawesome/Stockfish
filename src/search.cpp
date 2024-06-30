@@ -60,16 +60,16 @@ int a1=109, a2=40, a3=59, a4=328, a6=10, a7=186, a8=285, a9=20, a10=1524, a11=70
     u1=51,
     z1=4;
 
-TUNE(a1, a2, a3, a4, a6, a7, a8, a9, a10, a11, a12, a13,
-     b1, b2, b3, b4, b5, b6, b7,
-     c1, c2, c3, c4, c5, c7, c8, c9, c10, c11, c12, c13,
+TUNE(a1, a2, a3, a4, a7, a8, a9, a10, a11, a12, a13,
+     b1, b3, b4, b5, b6, b7,
+     c1, c2, c3, c4, c5, c7, c9, c10, c11, c13,
      d1, d2, d3, d4, d5, dub, d6, d7, d8,
-     e1, e2, e3, e4, e5, e6, e7, e8,
+     e1, e3, e4, e5, e6, e7, e8,
      f1, f2, f3, f4, f5, f6, f7, f8, f9, f15,
-     g1, g2, g3, g6, g7, g8, g9, g10, g11,
+     g1, g2, g6, g7, g8, g9, g10, g11,
      g12, g13, g14, g15, g16, g17,
      h1, h2, h3, h4, h5, h6, h7,
-     u1, z1);
+     u1);
 
 TUNE(SetRange(1, 2*a6), a6);
 TUNE(SetRange(1, 2*b2), b2);
